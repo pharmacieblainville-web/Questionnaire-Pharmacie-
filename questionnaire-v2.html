@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire de Santé - Patients Orphelins</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d3b66 0%, #003d82 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0d3b66 0%, #003d82 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #06d6a0;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .form-content {
+            padding: 30px;
+        }
+
+        .section-title {
+            color: #0d3b66;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #06d6a0;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #06d6a0;
+            box-shadow: 0 0 5px rgba(6, 214, 160, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group,
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #06d6a0;
+        }
+
+        .checkbox-item label,
+        .radio-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+            font-size: 15px;
+        }
+
+        .form-footer {
+            background: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #06d6a0;
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: #05b884;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(6, 214, 160, 0.4);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: #ddd;
+            color: #333;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-reset:hover {
+            background: #ccc;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #06d6a0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .form-content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            label {
+                font-size: 15px;
+            }
+
+            input, textarea, select {
+                font-size: 16px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 10px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <h1>Questionnaire de Santé</h1>
+            <p>Préparation de votre prise en charge en pharmacie</p>
+        </div>
+
+        <div class="form-content">
+            <div class="success-message" id="successMsg">✓ Formulaire envoyé avec succès! Merci.</div>
+            <div class="error-message" id="errorMsg">❌ Veuillez remplir tous les champs obligatoires</div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Envoi en cours...</p>
+            </div>
+
+            <form id="healthForm">
+
+                <!-- SECTION 1: COORDONNÉES -->
+                <h3 class="section-title">1. VOS COORDONNÉES</h3>
+                <div class="form-group">
+                    <label for="nom">Nom complet *</label>
+                    <input type="text" id="nom" name="nom" required>
+                </div>
+                <div class="form-group">
+                    <label for="adresse">Adresse *</label>
+                    <input type="text" id="adresse" name="adresse" required>
+                </div>
+                <div class="form-group">
+                    <label for="telephone">Téléphone *</label>
+                    <input type="text" id="telephone" name="telephone" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Courriel</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="dateNaissance">Date de naissance *</label>
+                    <input type="date" id="dateNaissance" name="dateNaissance" required>
+                </div>
+                <div class="form-group">
+                    <label for="nam">NAM (RAMQ)</label>
+                    <input type="text" id="nam" name="nam">
+                </div>
+                <div class="form-group">
+                    <label for="contact">Personne-contact ou proche aidant *</label>
+                    <input type="text" id="contact" name="contact" required>
+                </div>
+                <div class="form-group">
+                    <label for="langue">Langue de communication préférée *</label>
+                    <select id="langue" name="langue" required>
+                        <option value="">-- Sélectionnez --</option>
+                        <option value="Français">Français</option>
+                        <option value="Anglais">Anglais</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+
+                <!-- SECTION 2: SYMPTÔMES -->
+                <h3 class="section-title">2. SYMPTÔMES ET SENSATIONS QUE VOUS RESSENTEZ</h3>
+                <div class="form-group">
+                    <label>Poids (kg) et Taille (cm)</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <input type="number" id="poids" name="poids" placeholder="Poids (kg)">
+                        <input type="number" id="taille" name="taille" placeholder="Taille (cm)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous des maux de tête ou des étourdissements? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q1_non" name="maux_tete" value="Non" required>
+                            <label for="q1_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q1_oui" name="maux_tete" value="Oui" required>
+                            <label for="q1_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous des palpitations ou battements cardiaques irréguliers? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q2_non" name="palpitations" value="Non" required>
+                            <label for="q2_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q2_oui" name="palpitations" value="Oui" required>
+                            <label for="q2_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous de l'essoufflement ou difficulté à respirer? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q3_non" name="essoufflement" value="Non" required>
+                            <label for="q3_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q3_oui" name="essoufflement" value="Oui" required>
+                            <label for="q3_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous une fatigue anormale ou grande faiblesse? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q4_non" name="fatigue" value="Non" required>
+                            <label for="q4_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q4_oui" name="fatigue" value="Oui" required>
+                            <label for="q4_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous une soif excessive? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q5_non" name="soif" value="Non" required>
+                            <label for="q5_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q5_oui" name="soif" value="Oui" required>
+                            <label for="q5_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous des douleurs à la poitrine ou aux bras? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q6_non" name="douleur_poitrine" value="Non" required>
+                            <label for="q6_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q6_oui" name="douleur_poitrine" value="Oui" required>
+                            <label for="q6_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous besoin d'uriner plus souvent que d'habitude? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q7_non" name="uriner" value="Non" required>
+                            <label for="q7_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q7_oui" name="uriner" value="Oui" required>
+                            <label for="q7_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous une vision brouillée ou changements visuels? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q8_non" name="vision" value="Non" required>
+                            <label for="q8_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q8_oui" name="vision" value="Oui" required>
+                            <label for="q8_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous des enflures aux jambes ou pieds? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q9_non" name="enflures" value="Non" required>
+                            <label for="q9_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q9_oui" name="enflures" value="Oui" required>
+                            <label for="q9_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous des plaies qui cicatrisent lentement? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q10_non" name="cicatrisation" value="Non" required>
+                            <label for="q10_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q10_oui" name="cicatrisation" value="Oui" required>
+                            <label for="q10_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous des fourmillements ou engourdissements? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q11_non" name="fourmillements" value="Non" required>
+                            <label for="q11_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q11_oui" name="fourmillements" value="Oui" required>
+                            <label for="q11_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avez-vous une perte de poids inexpliquée? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="q12_non" name="poids_perte" value="Non" required>
+                            <label for="q12_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="q12_oui" name="poids_perte" value="Oui" required>
+                            <label for="q12_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: ALLERGIES -->
+                <h3 class="section-title">3. ALLERGIES ET INTOLÉRANCES</h3>
+                <div class="form-group">
+                    <label>Avez-vous des allergies ou intolérances? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="allergie_non" name="allergies" value="Non" required>
+                            <label for="allergie_non">Non, aucune connue</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="allergie_oui" name="allergies" value="Oui" required>
+                            <label for="allergie_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="allergie_details" style="display: none;">
+                    <label for="substance">Substance allergène</label>
+                    <input type="text" id="substance" name="substance">
+                </div>
+                <div class="form-group" id="reaction_details" style="display: none;">
+                    <label for="reaction">Réaction observée</label>
+                    <textarea id="reaction" name="reaction" placeholder="ex: éruption cutanée, enflure, difficulté à respirer"></textarea>
+                </div>
+
+                <!-- SECTION 4: MÉDICAMENTS -->
+                <h3 class="section-title">4. VOS MÉDICAMENTS ACTUELS</h3>
+                <div class="form-group">
+                    <label>Obtenez-vous des médicaments dans une autre pharmacie? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="medic_non" name="autre_pharmacie" value="Non" required>
+                            <label for="medic_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="medic_oui" name="autre_pharmacie" value="Oui" required>
+                            <label for="medic_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="pharma_details" style="display: none;">
+                    <label for="pharmacie">Si oui, laquelle?</label>
+                    <input type="text" id="pharmacie" name="pharmacie">
+                </div>
+
+                <!-- SECTION 5: HABITUDES -->
+                <h3 class="section-title">5. HABITUDES DE VIE</h3>
+                <div class="form-group">
+                    <label>Tabac *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="tab_non" name="tabac" value="Non-fumeur" required>
+                            <label for="tab_non">Non-fumeur</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="tab_actif" name="tabac" value="Fumeur actif" required>
+                            <label for="tab_actif">Fumeur actif</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="tab_ex" name="tabac" value="Ex-fumeur" required>
+                            <label for="tab_ex">Ex-fumeur</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Alcool *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="alc_aucun" name="alcool" value="Aucun" required>
+                            <label for="alc_aucun">Aucun</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="alc_occ" name="alcool" value="Occasionnel" required>
+                            <label for="alc_occ">Occasionnel</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="alc_reg" name="alcool" value="Régulier" required>
+                            <label for="alc_reg">Régulier</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cannabis *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="can_non" name="cannabis" value="Non" required>
+                            <label for="can_non">Non</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="can_oui" name="cannabis" value="Oui" required>
+                            <label for="can_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Activité physique *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="act_sed" name="activite" value="Sédentaire" required>
+                            <label for="act_sed">Sédentaire</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="act_leg" name="activite" value="Légère" required>
+                            <label for="act_leg">Légère</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="act_mod" name="activite" value="Modérée" required>
+                            <label for="act_mod">Modérée</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="act_act" name="activite" value="Active" required>
+                            <label for="act_act">Active</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lifestyle">Comment décririez-vous votre alimentation, sommeil et niveau de stress? *</label>
+                    <textarea id="lifestyle" name="lifestyle" required></textarea>
+                </div>
+
+                <!-- SECTION 6: VACCINS -->
+                <h3 class="section-title">6. STATUT VACCINAL</h3>
+                <div class="form-group">
+                    <label>Vaccins reçus (cochez les applicables)</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vacc_base" name="vaccins" value="Vaccination de base à jour">
+                            <label for="vacc_base">Vaccination de base à jour</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vacc_grippe" name="vaccins" value="Grippe">
+                            <label for="vacc_grippe">Grippe</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vacc_covid" name="vaccins" value="COVID-19">
+                            <label for="vacc_covid">COVID-19</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vacc_zona" name="vaccins" value="Zona">
+                            <label for="vacc_zona">Zona</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vacc_pneumo" name="vaccins" value="Pneumocoque">
+                            <label for="vacc_pneumo">Pneumocoque</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vacc_sais" name="vaccins" value="Je ne sais pas">
+                            <label for="vacc_sais">Je ne sais pas</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="date_vaccin">Date approximative du dernier vaccin reçu</label>
+                    <input type="date" id="date_vaccin" name="date_vaccin">
+                </div>
+
+                <!-- SECTION 7: ÉVÉNEMENTS RÉCENTS -->
+                <h3 class="section-title">7. ÉVÉNEMENTS DE SANTÉ RÉCENTS</h3>
+                <div class="form-group">
+                    <label>Au cours des 12 derniers mois (cochez les applicables)</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="evt_hosp" name="evenements" value="Hospitalisation">
+                            <label for="evt_hosp">Hospitalisation</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="evt_urg" name="evenements" value="Visite urgence">
+                            <label for="evt_urg">Visite urgence</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="evt_chute" name="evenements" value="Chute">
+                            <label for="evt_chute">Chute</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="evt_details">Si oui, précisez (date, motif)</label>
+                    <textarea id="evt_details" name="evt_details"></textarea>
+                </div>
+
+                <!-- SECTION 8: PRISE MÉDICAMENTS -->
+                <h3 class="section-title">8. PRISE DE VOS MÉDICAMENTS</h3>
+                <div class="form-group">
+                    <label>Avez-vous de la difficulté à prendre vos médicaments? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="diff_non" name="difficulte_medic" value="Non" required>
+                            <label for="diff_non">Non, aucune difficulté</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="diff_oui" name="difficulte_medic" value="Oui" required>
+                            <label for="diff_oui">Oui</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="diff_details" style="display: none;">
+                    <label for="difficulte_desc">Précisez (oublis, coût, effets secondaires, etc.)</label>
+                    <textarea id="difficulte_desc" name="difficulte_desc"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Utilisez-vous un pilulier? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="pilul_oui" name="pilulier" value="Oui" required>
+                            <label for="pilul_oui">Oui</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="pilul_non" name="pilulier" value="Non" required>
+                            <label for="pilul_non">Non</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 9: SITUATION PERSONNELLE -->
+                <h3 class="section-title">9. SITUATION PERSONNELLE</h3>
+                <div class="form-group">
+                    <label>Situations personnelles (cochez les applicables)</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sit_seul" name="situations" value="Je vis seul(e)">
+                            <label for="sit_seul">Je vis seul(e)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sit_aidant" name="situations" value="J'ai un proche aidant">
+                            <label for="sit_aidant">J'ai un proche aidant</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sit_mobilite" name="situations" value="Mobilité réduite">
+                            <label for="sit_mobilite">Mobilité réduite</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sit_langue" name="situations" value="Barrière linguistique">
+                            <label for="sit_langue">Barrière linguistique</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="autre_element">Autre élément que vous jugez pertinent de partager</label>
+                    <textarea id="autre_element" name="autre_element"></textarea>
+                </div>
+
+                <!-- SECTION 10: PRÉOCCUPATIONS -->
+                <h3 class="section-title">10. VOS PRÉOCCUPATIONS ACTUELLES</h3>
+                <div class="form-group">
+                    <label for="preoccupations">Avez-vous de nouveaux symptômes, des effets indésirables ou des questions pour le pharmacien?</label>
+                    <textarea id="preoccupations" name="preoccupations"></textarea>
+                </div>
+
+                <!-- SECTION 11: GAMF -->
+                <h3 class="section-title">11. GUICHET D'ACCÈS À UN MÉDECIN DE FAMILLE (GAMF)</h3>
+                <div class="form-group">
+                    <label>Êtes-vous inscrit(e) au GAMF? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="gamf_oui" name="gamf" value="Oui, déjà inscrit(e)" required>
+                            <label for="gamf_oui">Oui, déjà inscrit(e)</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="gamf_non" name="gamf" value="Non, pas encore inscrit(e)" required>
+                            <label for="gamf_non">Non, pas encore inscrit(e)</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="gamf_sais" name="gamf" value="Je ne sais pas" required>
+                            <label for="gamf_sais">Je ne sais pas</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <p class="info-text">
+                        Si ce n'est pas déjà fait, nous vous encourageons à vous inscrire au www.gamf.gouv.qc.ca — c'est gratuit et prend moins de 2 minutes.
+                    </p>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="form-footer">
+            <button class="btn-submit" id="submitBtn" onclick="submitForm()">Envoyer</button>
+            <button class="btn-reset" onclick="resetForm()">Réinitialiser</button>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ MODIFIER CETTE URL PAR CELLE DE VOTRE GOOGLE APPS SCRIPT
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytARQKr4eBfcobJYjYAiGpuLWJZFK9F7GL1tSG-DVq1QqrPbpr5HOfgQTbCeQaoYpE_g/exec';
+
+        // Afficher/masquer les champs conditionnels
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('allergie_non').addEventListener('change', toggleAllergie);
+            document.getElementById('allergie_oui').addEventListener('change', toggleAllergie);
+            document.getElementById('medic_non').addEventListener('change', togglePharmacie);
+            document.getElementById('medic_oui').addEventListener('change', togglePharmacie);
+            document.getElementById('diff_non').addEventListener('change', toggleDifficulte);
+            document.getElementById('diff_oui').addEventListener('change', toggleDifficulte);
+
+            // Charger les données sauvegardées
+            loadFormData();
+        });
+
+        function toggleAllergie() {
+            const show = document.getElementById('allergie_oui').checked;
+            document.getElementById('allergie_details').style.display = show ? 'block' : 'none';
+            document.getElementById('reaction_details').style.display = show ? 'block' : 'none';
+        }
+
+        function togglePharmacie() {
+            const show = document.getElementById('medic_oui').checked;
+            document.getElementById('pharma_details').style.display = show ? 'block' : 'none';
+        }
+
+        function toggleDifficulte() {
+            const show = document.getElementById('diff_oui').checked;
+            document.getElementById('diff_details').style.display = show ? 'block' : 'none';
+        }
+
+        function submitForm() {
+            const form = document.getElementById('healthForm');
+            
+            if (!form.checkValidity()) {
+                document.getElementById('errorMsg').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('errorMsg').style.display = 'none';
+                }, 3000);
+                return;
+            }
+
+            // Afficher le loader
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+
+            // Collecter les données du formulaire
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            // Gérer les checkboxes multiples
+            const vaccinElements = document.querySelectorAll('input[name="vaccins"]:checked');
+            data.vaccins = Array.from(vaccinElements).map(e => e.value).join(', ');
+            
+            const evenementElements = document.querySelectorAll('input[name="evenements"]:checked');
+            data.evenements = Array.from(evenementElements).map(e => e.value).join(', ');
+            
+            const situationElements = document.querySelectorAll('input[name="situations"]:checked');
+            data.situations = Array.from(situationElements).map(e => e.value).join(', ');
+
+            // Envoyer à Google Sheets via Apps Script
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.success) {
+                    // Succès!
+                    document.getElementById('successMsg').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('successMsg').style.display = 'none';
+                    }, 3000);
+                    
+                    // Effacer le formulaire
+                    form.reset();
+                    localStorage.removeItem('formData');
+                    
+                } else {
+                    document.getElementById('errorMsg').textContent = '❌ Erreur lors de l\'envoi. Veuillez réessayer.';
+                    document.getElementById('errorMsg').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('errorMsg').style.display = 'none';
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('errorMsg').textContent = '❌ Erreur de connexion. Vérifiez votre URL.';
+                document.getElementById('errorMsg').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('errorMsg').style.display = 'none';
+                }, 3000);
+            })
+            .finally(() => {
+                document.getElementById('submitBtn').disabled = false;
+            });
+        }
+
+        function saveFormData() {
+            const form = document.getElementById('healthForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            localStorage.setItem('formData', JSON.stringify(data));
+        }
+
+        function loadFormData() {
+            const data = JSON.parse(localStorage.getItem('formData') || '{}');
+            for (const [key, value] of Object.entries(data)) {
+                const element = document.querySelector(`[name="${key}"]`);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = value.split(', ').includes(element.value);
+                    } else if (element.type === 'radio') {
+                        if (element.value === value) {
+                            element.checked = true;
+                        }
+                    } else {
+                        element.value = value;
+                    }
+                }
+            }
+        }
+
+        // Auto-save toutes les 30 secondes
+        setInterval(saveFormData, 30000);
+
+        function resetForm() {
+            if (confirm('Êtes-vous sûr de vouloir réinitialiser le formulaire?')) {
+                document.getElementById('healthForm').reset();
+                localStorage.removeItem('formData');
+                toggleAllergie();
+                togglePharmacie();
+                toggleDifficulte();
+            }
+        }
+
+        // Mettre à jour la barre de progression
+        document.addEventListener('input', function() {
+            const form = document.getElementById('healthForm');
+            const inputs = form.querySelectorAll('input, textarea, select');
+            let filled = 0;
+            inputs.forEach(input => {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    if (input.checked) filled++;
+                } else if (input.value) {
+                    filled++;
+                }
+            });
+            const progress = (filled / inputs.length) * 100;
+            document.querySelector('.progress-fill').style.width = progress + '%';
+        });
+    </script>
+</body>
+</html>
